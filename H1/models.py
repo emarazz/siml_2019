@@ -26,7 +26,7 @@ def compute_gradient(y, tx, theta):
     '''
     z = tx @ theta
     gradient = - tx.T @ y
-    gradient = gradient + tx.T @ softmax(z)
+    gradient = gradient + tx.T @ (softmax(z) * y)
     return gradient
 
 def compute_acc(y, tx, theta):
