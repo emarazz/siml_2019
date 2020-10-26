@@ -62,9 +62,9 @@ def compute_hessian2(y, tx, theta):
     for i in range(K):
         for j in range(K):
             if i == j:
-                np.fill_diagonal(W_tilde[i*N:(i+1)*N, j*K:(j+1)*K], p[:,i]*(1-p[:,j]))
+                np.fill_diagonal(W_tilde[i*N:(i+1)*N, j*N:(j+1)*N], p[:,i]*(1-p[:,j]))
             else:
-                np.fill_diagonal(W_tilde[i*N:(i+1)*N, j*K:(j+1)*K], -p[:,i]*p[:,j])
+                np.fill_diagonal(W_tilde[i*N:(i+1)*N, j*N:(j+1)*N], -p[:,i]*p[:,j])
 
     hessian = tx_tilde.T @ W_tilde @ tx_tilde 
     return hessian
