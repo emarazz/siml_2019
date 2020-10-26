@@ -175,10 +175,10 @@ def backtracking_line_search(y_train, x_train, y_test, x_test, theta_0, rho, c, 
     Newtons method with backtracking line search.
     '''
     thetas_s, losses_train, losses_test, alphas = [], [], [], [] # store values to plot and display results
-    alpha, theta, n_iter, bt_cond = 1, theta_0, 0, True
-    while bt_cond:
-        loss_train = compute_loss(y_train, x_train, theta)
-        loss_test = compute_loss(y_test, x_test, theta)
+    alpha, theta, n_iter, bt_cond = 1, theta_0, 0, False
+    while not bt_cond:
+        loss_train = compute_loss(y_train, x_train, theta) # Calculate train loss
+        loss_test = compute_loss(y_test, x_test, theta) # Calculate test loss
         losses_train.append(loss_train) # store train losses
         losses_test.append(loss_test) # store test losses
         thetas_s.append(theta) # store thetas
@@ -187,13 +187,17 @@ def backtracking_line_search(y_train, x_train, y_test, x_test, theta_0, rho, c, 
                 n_iter+1 ,loss_train,compute_acc(y_train, x_train, theta),
                 loss_test,compute_acc(y_test, x_test, theta)))
         gradient = compute_gradient2(y_train, x_train, theta) # Calculate the gradient stacked
-        hessian = compute_hessian2(y_train, x_train, theta)
-        bt_cond = (compute_loss(y_train, x_train, theta - alpha) <= loss_train-alpha*c*gradient).any()
+        hessian = compute_hessian2(y_train, x_train, theta) # Calculate Hessian
+        pk = np.linalg.pinv(hessian) @ gradient
+        bt_cond = compute_loss(y_train, x_train, theta + alpha*pk.T.reshape(theta.shape)) <= loss_train+alpha*c*gradient.T.dot(pk) # Test backtracking condition
         alpha *= rho # update step size
         alphas.append(alpha) # store step size
-        theta = theta.T.reshape(-1,1).squeeze() # Squeeze the weights
-        theta = theta - alpha*(np.linalg.pinv(hessian) @ gradient) # Update the gradient
-        theta = theta.reshape(theta_0.T.shape).T # Unsqueezer the weights
+        if not bt_cond:
+            theta = theta.T.reshape(-1,1).squeeze() # Squeeze the weights
+            theta = theta - alpha*pk # Update the gradient
+            theta = theta.reshape(theta_0.T.shape).T # Unsqueezer the weights
         n_iter += 1 # increment iteration count
-    print('')
+    print('iterations : {} - train_loss = {:0.2f}, train_acc = {:0.2f}, test_loss = {:0.2f}, test_acc = {:0.2f}'.format(
+                n_iter ,loss_train,compute_acc(y_train, x_train, theta),
+                loss_test,compute_acc(y_test, x_test, theta)))
     return losses_train, losses_test, thetas_s, alphas
