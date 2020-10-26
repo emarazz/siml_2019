@@ -55,7 +55,7 @@ def compute_hessian2(y, tx, theta):
     z = tx @ theta
     N = tx.shape[0]
     K = theta.shape[1]
-    p = softmax(z)*y
+    p = softmax(z)
     
     tx_tilde = np.kron(np.eye(K), tx) # Kronecker product
     W_tilde = np.zeros((N*K, N*K))
