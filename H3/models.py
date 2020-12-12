@@ -3,24 +3,45 @@ from utils import *
 
 def normal_d(x,mu,sigma):
     """
-    normal distribution
+    multivariate normal distribution pdf
     """
-    return 1/(sigma*np.sqrt(2*np.pi)) * np.exp(-1/2 * np.power((x-mu)/sigma,2))
+    pdf = 1/( np.sqrt(np.power(2*np.pi,len(x)) * np.linalg.det(sigma)))
+    pdf = pdf * np.exp(-1/2 * (x-mu).reshape(1,-1) @ np.linalg.inv(sigma) @ (x-mu).reshape(-1,1))
+    return pdf.squeeze()
+def gamma_d(x,a,b):
+    """
+    gamma distribution pdf
+    """
+    gamma = factorial(a-1)
+    return np.power(b,a)/gamma * np.power(x,a-1) * np.exp(-b*x)
 
-def gamma_d(x,alpha,beta):
+def dirichlet_d(delta):
     """
-    gamma distribution
+    dirichlet distribution pdf
     """
-    gamma = factorial(alpha-1)
-    return np.power(beta,alpha)/gamma * np.power(x,alpha-1) * np.exp(-beta*x)
+    # TODO: check what exactly is rho_d
+    return np.prod(np.power(rho_d,delta-1))
 
-def dirichlet_d(x,alpha):
+def p_zi_xi(x,rho,mu,phi):
     """
-    dirichlet distribution
+    posterior probability that the observation xi has been generated from the k-th component
     """
-    gamma_num = np.array([factorial(alpha[i]) for i in range(len(alpha))])
-    gamma_den = np.factorial(np.sum(alpha)-1)
-    beta = np.prod(gamma_num)/gamma_den
-    return 1/beta * np.prod(np.power(x,alpha-1))
+    x = x.reshape(-1,1)
+    rho = rho.reshape(1,-1)
+    mu = mu.reshape(1,-1)
+    phi = phi.reshape(1,-1)
+
+    numerator = rho*np.sqrt(phi) * np.exp(-phi/2 * np.power(x-mu,2))
+    denominator = numerator.sum(axis=1).reshape(-1,1)
+    
+    return numerator/denominator
 
 
+# def dirichlet_d2(x,alpha):
+#     """
+#     dirichlet distribution
+#     """
+#     gamma_num = np.array([factorial(alpha[i]) for i in range(len(alpha))])
+#     gamma_den = np.factorial(np.sum(alpha)-1)
+#     beta = np.prod(gamma_num)/gamma_den
+#     return 1/beta * np.prod(np.power(x,alpha-1))
