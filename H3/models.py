@@ -22,7 +22,7 @@ def dirichlet_d(x,delta):
     """
     dirichlet distribution pdf
     """
-    return np.prod(np.power(x,delta-1))
+    return np.repeat(np.prod(np.power(x,delta-1)),len(delta))
 
 def p_zi_xi(x,rho,mu,phi):
     """
