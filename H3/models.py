@@ -1,26 +1,28 @@
 import numpy as np
+from scipy.special import factorial
 from utils import *
 
 def normal_d(x,mu,sigma):
     """
-    multivariate normal distribution pdf
+    normal distribution
     """
-    pdf = 1/( np.sqrt(np.power(2*np.pi,len(x)) * np.linalg.det(sigma)))
-    pdf = pdf * np.exp(-1/2 * (x-mu).reshape(1,-1) @ np.linalg.inv(sigma) @ (x-mu).reshape(-1,1))
-    return pdf.squeeze()
+    pdf = 1/(sigma*np.sqrt(2*np.pi)) * np.exp(-1/(2*np.power(sigma,2))*np.power(x-mu,2))
+    return pdf
+
 def gamma_d(x,a,b):
     """
     gamma distribution pdf
     """
     gamma = factorial(a-1)
-    return np.power(b,a)/gamma * np.power(x,a-1) * np.exp(-b*x)
+    pdf = 1/gamma* np.power(b,a) * np.power(x,a-1) * np.exp(-b*x)
+    pdf[np.isnan(pdf)] = 0
+    return pdf
 
-def dirichlet_d(delta):
+def dirichlet_d(x,delta):
     """
     dirichlet distribution pdf
     """
-    # TODO: check what exactly is rho_d
-    return np.prod(np.power(rho_d,delta-1))
+    return np.prod(np.power(x,delta-1))
 
 def p_zi_xi(x,rho,mu,phi):
     """
@@ -45,3 +47,14 @@ def p_zi_xi(x,rho,mu,phi):
 #     gamma_den = np.factorial(np.sum(alpha)-1)
 #     beta = np.prod(gamma_num)/gamma_den
 #     return 1/beta * np.prod(np.power(x,alpha-1))
+
+# def normal_d(x,mu,sigma):
+#     """
+#     multivariate normal distribution pdf
+#     """
+#     x = np.array(x)
+#     r = len(x)
+    
+#     pdf = 1/( np.sqrt(np.power(2*np.pi,r) * np.linalg.det(sigma)))
+#     pdf = pdf * np.exp(-1/2 * (x-mu).reshape(1,-1) @ np.linalg.inv(sigma) @ (x-mu).reshape(-1,1))
+#     return pdf.squeeze()
