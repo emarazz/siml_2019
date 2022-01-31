@@ -1,0 +1,12 @@
+name: siml_2020
+channels:
+  - defaults
+dependencies:
+  - python=3
+  - ipykernel
+  - matplotlib
+  - pandas
+  - scipy
+  - jinja2
+  - jupyterlab
+  - statsmodels
